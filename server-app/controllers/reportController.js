@@ -1,55 +1,41 @@
+const { Presensi } = require('../models');
 const { Op } = require("sequelize");
-const { format } = require("date-fns-tz");
-const timeZone = "Asia/Jakarta";
 
 exports.getDailyReport = async (req, res) => {
   try {
-    const { Presensi } = require("../models");
+    const { nama, tanggalMulai, tanggalSelesai } = req.query;
+    let where = {};
 
-    // optional query param: ?date=YYYY-MM-DD
-    const dateQuery = req.query.date;
-    let start, end;
-
-    if (dateQuery) {
-      const d = new Date(dateQuery);
-      if (isNaN(d.getTime())) {
-        return res.status(400).json({ message: "Invalid date format. Gunakan YYYY-MM-DD" });
-      }
-      start = new Date(`${dateQuery}T00:00:00`);
-      end = new Date(`${dateQuery}T23:59:59.999`);
-    } else {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, "0");
-      const dd = String(today.getDate()).padStart(2, "0");
-      start = new Date(`${yyyy}-${mm}-${dd}T00:00:00`);
-      end = new Date(`${yyyy}-${mm}-${dd}T23:59:59.999`);
+    if (nama) {
+      where.nama = { [Op.like]: `%${nama}%` };
     }
 
-    console.log(`Controller: Mengambil laporan dari ${start.toISOString()} sampai ${end.toISOString()}`);
+    if (tanggalMulai && tanggalSelesai) {
+      const start = new Date(tanggalMulai);
+      const end = new Date(tanggalSelesai);
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ message: 'tanggalMulai atau tanggalSelesai tidak valid' });
+      }
+      end.setHours(23, 59, 59, 999);
+      where.checkIn = { [Op.between]: [start, end] };
+    } else if (tanggalMulai) {
+      const start = new Date(tanggalMulai);
+      if (isNaN(start.getTime())) return res.status(400).json({ message: 'tanggalMulai tidak valid' });
+      where.checkIn = { [Op.gte]: start };
+    } else if (tanggalSelesai) {
+      const end = new Date(tanggalSelesai);
+      if (isNaN(end.getTime())) return res.status(400).json({ message: 'tanggalSelesai tidak valid' });
+      end.setHours(23, 59, 59, 999);
+      where.checkIn = { [Op.lte]: end };
+    }
 
-    const records = await Presensi.findAll({
-      where: {
-        checkIn: { [Op.between]: [start, end] },
-      },
-      order: [["checkIn", "ASC"]],
-    });
-
-    const data = records.map((r) => ({
-      id: r.id,
-      userId: r.userId,
-      nama: r.nama,
-      checkIn: r.checkIn ? format(r.checkIn, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }) : null,
-      checkOut: r.checkOut ? format(r.checkOut, "yyyy-MM-dd HH:mm:ssXXX", { timeZone }) : null,
-    }));
+    const records = await Presensi.findAll({ where, order: [['checkIn', 'ASC']] });
 
     res.json({
-      reportDate: dateQuery || start.toISOString().slice(0, 10),
-      count: data.length,
-      data,
+      reportDate: new Date().toLocaleDateString(),
+      data: records,
     });
   } catch (error) {
-    console.error("reportController.getDailyReport error:", error);
-    res.status(500).json({ message: "Terjadi kesalahan pada server", error: error.message });
+    res.status(500).json({ message: "Gagal mengambil laporan", error: error.message });
   }
 };
