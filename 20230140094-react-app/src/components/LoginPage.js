@@ -1,36 +1,36 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); 
-    setError(null); 
+    const handleSubmit = async (e) => {
+        e.preventDefault(); 
+        setError(null); 
 
-    try {
-      
-      const response = await axios.post('http://localhost:3001/api/auth/login', {
-        email: email,
-        password: password
-      });
+        try {
+        
+        const response = await axios.post('http://localhost:3001/api/auth/login', {
+            email: email,
+            password: password
+        });
 
-      const token = response.data.token;
-      localStorage.setItem('token', token); 
+        const token = response.data.token;
+        localStorage.setItem('token', token); 
 
-      navigate('/dashboard');
+        window.location.href = '/dashboard';
+        //navigate('/dashboard');
 
-    } catch (err) {
-      // 4. Tangani error dari server
-      setError(err.response ? err.response.data.message : 'Login gagal');
-    }
-  };
+        } catch (err) {
+        setError(err.response ? err.response.data.message : 'Login gagal');
+        }
+    };
 
-  return (
+    return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
@@ -79,9 +79,15 @@ function LoginPage() {
         {error && (
           <p className="text-red-600 text-sm mt-4 text-center">{error}</p>
         )}
+
+        <p className="text-sm text-center mt-4">
+          Belum punya akun?{' '}
+          <Link to="/register" className="text-blue-600 hover:underline">
+            Daftar di sini
+          </Link>
+        </p>
       </div>
     </div>
   );
 }
 export default LoginPage;
-

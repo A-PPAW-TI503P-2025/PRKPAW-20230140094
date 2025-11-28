@@ -104,7 +104,7 @@ function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-sm hover:bg-green-700 disabled:opacity-60 text-base"
+            className="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-sm hover:bg-green-700 disabled:opacity-60 text-base"
           >
             {loading ? 'Mendaftar...' : 'Register'}
           </button>
