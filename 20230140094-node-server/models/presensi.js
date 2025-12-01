@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * The models/index file will call this method automatically.
      */
     static associate(models) {
-      Presensi.belongsTo(models.User, { foreignKey: 'userId' });
+      Presensi.belongsTo(models.User, { foreignKey: 'userId',as: 'user' });
     }
   }
   Presensi.init({
@@ -25,6 +25,14 @@ module.exports = (sequelize, DataTypes) => {
     checkOut: {
       type: DataTypes.DATE,
       allowNull: true, // Boleh null
+    },
+    latitude: {
+      type: DataTypes.DECIMAL(10, 7),
+      allowNull: false
+    },
+    longitude: {
+      type: DataTypes.DECIMAL(10, 7),
+      allowNull: false
     }
   }, {
     sequelize,
