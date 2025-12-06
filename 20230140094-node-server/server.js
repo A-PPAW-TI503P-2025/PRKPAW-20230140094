@@ -11,6 +11,10 @@ const { sequelize } = require('./models');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Serve static files from the 'uploads' directory
+const path = require('path'); 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));

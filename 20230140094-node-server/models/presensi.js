@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
     longitude: {
       type: DataTypes.DECIMAL(10, 7),
       allowNull: false
+    },
+    buktiFoto: {
+      type: DataTypes.STRING,
+      allowNull: true // Boleh null jika tidak ada foto
     }
   }, {
     sequelize,
