@@ -1,4 +1,4 @@
-# Tugas 10
+# Tugas 14
 
 Tampilan menu SensorLog di Navbar  :  
 ![alt text](ss/week14_MenuSensorLog.png)
